@@ -1,5 +1,4 @@
-const API_KEY = 'YOUR_API_KEY_HERE'; // DO NOT commit real API keys to GitHub!
-const BASE_URL = 'https://api.openweathermap.org/data/2.5';
+const BASE_URL = '/api/weather';
 
 // State Management
 let currentUnit = localStorage.getItem('weatherUnit') || 'metric'; // 'metric' or 'imperial'
@@ -130,8 +129,8 @@ async function fetchWeatherByCity(city) {
     showLoading();
     try {
         const [currentRes, forecastRes] = await Promise.all([
-            fetch(`${BASE_URL}/weather?q=${city}&appid=${API_KEY}&units=${currentUnit}`),
-            fetch(`${BASE_URL}/forecast?q=${city}&appid=${API_KEY}&units=${currentUnit}`)
+            fetch(`${BASE_URL}?endpoint=weather&q=${city}&units=${currentUnit}`),
+            fetch(`${BASE_URL}?endpoint=forecast&q=${city}&units=${currentUnit}`)
         ]);
 
         if (!currentRes.ok || !forecastRes.ok) throw new Error('City not found');
@@ -156,8 +155,8 @@ async function fetchWeatherByLocation() {
         const { latitude, longitude } = position.coords;
         try {
             const [currentRes, forecastRes] = await Promise.all([
-                fetch(`${BASE_URL}/weather?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=${currentUnit}`),
-                fetch(`${BASE_URL}/forecast?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=${currentUnit}`)
+                fetch(`${BASE_URL}?endpoint=weather&lat=${latitude}&lon=${longitude}&units=${currentUnit}`),
+                fetch(`${BASE_URL}?endpoint=forecast&lat=${latitude}&lon=${longitude}&units=${currentUnit}`)
             ]);
 
             if (!currentRes.ok || !forecastRes.ok) throw new Error('Location data not found');
@@ -481,7 +480,7 @@ async function renderComparisonList() {
 
     for (const city of comparisonCities) {
         try {
-            const res = await fetch(`${BASE_URL}/weather?q=${city}&appid=${API_KEY}&units=${currentUnit}`);
+            const res = await fetch(`${BASE_URL}?endpoint=weather&q=${city}&units=${currentUnit}`);
             if (!res.ok) continue;
             const data = await res.json();
 

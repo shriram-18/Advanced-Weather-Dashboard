@@ -1,7 +1,8 @@
-module.exports = async function handler(req, res) {
+const https = require('https');
+
+module.exports = function handler(req, res) {
     const { endpoint, q, lat, lon, units } = req.query;
 
-    // Vercel securely injects this from the Project Settings > Environment Variables
     const API_KEY = process.env.OPENWEATHER_API_KEY;
 
     if (!API_KEY) {
@@ -12,25 +13,31 @@ module.exports = async function handler(req, res) {
         return res.status(400).json({ error: 'Invalid weather endpoint requested.' });
     }
 
-    // Build the secure OpenWeather URL
     let url = `https://api.openweathermap.org/data/2.5/${endpoint}?appid=${API_KEY}`;
 
-    // Append the query parameters sent from the frontend
     if (q) url += `&q=${encodeURIComponent(q)}`;
     if (lat && lon) url += `&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`;
     if (units) url += `&units=${encodeURIComponent(units)}`;
 
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
+    https.get(url, (apiRes) => {
+        let data = '';
 
-        if (!response.ok) {
-            return res.status(response.status).json(data);
-        }
+        apiRes.on('data', (chunk) => {
+            data += chunk;
+        });
 
-        // Return the clean data to the frontend!
-        res.status(200).json(data);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to communicate with OpenWeather API.' });
-    }
-}
+        apiRes.on('end', () => {
+            try {
+                const parsedData = JSON.parse(data);
+                if (apiRes.statusCode !== 200) {
+                    return res.status(apiRes.statusCode).json(parsedData);
+                }
+                res.status(200).json(parsedData);
+            } catch (e) {
+                res.status(500).json({ error: 'Failed to parse OpenWeather API response.' });
+            }
+        });
+    }).on('error', (err) => {
+        res.status(500).json({ error: 'Network error communicating with OpenWeather.', details: err.message });
+    });
+};

@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     const { endpoint, q, lat, lon, units } = req.query;
 
     // Vercel securely injects this from the Project Settings > Environment Variables

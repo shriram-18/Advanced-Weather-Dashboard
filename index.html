@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Weather Dashboard</title>
+    <!-- Modern Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for Trend Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="theme-auto">
+    <!-- Top Controls Navigation -->
+    <nav class="top-controls">
+        <div class="control-group">
+            <button id="btn-theme" class="control-btn" title="Toggle Theme">
+                <i class="fa-solid fa-circle-half-stroke"></i> <span>Auto Menu</span>
+            </button>
+            <div class="theme-dropdown hidden" id="theme-dropdown">
+                <button class="theme-option active" data-theme="auto"><i class="fa-solid fa-magic"></i> Auto</button>
+                <button class="theme-option" data-theme="light"><i class="fa-solid fa-sun"></i> Light</button>
+                <button class="theme-option" data-theme="dark"><i class="fa-solid fa-moon"></i> Dark</button>
+            </div>
+        </div>
+        <div class="control-group">
+            <button id="btn-unit" class="control-btn" title="Toggle Units (°C / °F)">
+                <i class="fa-solid fa-temperature-half"></i> <span id="unit-label">°C</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="app-container">
+        <!-- Search Section -->
+        <header class="search-section">
+            <div class="search-wrapper">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="city-input" placeholder="Search for a city..." autocomplete="off">
+                    <button id="search-btn">Search</button>
+                </div>
+                <button id="btn-location" class="location-btn" title="Use My Location">
+                    <i class="fa-solid fa-location-crosshairs"></i>
+                </button>
+            </div>
+
+            <!-- Error Message Container -->
+            <div id="error-message" class="error-message hidden">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span id="error-text">City not found. Please try again.</span>
+            </div>
+        </header>
+
+        <!-- Weather Alerts Banner -->
+        <div id="alerts-banner" class="alerts-banner hidden">
+            <i class="fa-solid fa-triangle-exclamation pulse"></i>
+            <div class="alert-content">
+                <p id="alert-text">Warning: Severe Weather Alert</p>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-spinner" class="loading-spinner hidden">
+            <div class="spinner"></div>
+            <p>Fetching forecast data...</p>
+        </div>
+
+        <!-- Main Dashboard Grid -->
+        <div id="dashboard-grid" class="dashboard-grid hidden">
+
+            <!-- Left Column: Current & Hourly -->
+            <div class="dashboard-left">
+                <!-- Current Weather Card -->
+                <section id="weather-card" class="weather-card panel">
+                    <div class="card-header">
+                        <div class="location-container">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <h1 id="city-name">--</h1>
+                        </div>
+                        <div class="datetime-container">
+                            <p id="current-date">--</p>
+                            <p id="current-time">--</p>
+                        </div>
+                    </div>
+
+                    <div class="main-weather">
+                        <img id="weather-icon" src="" alt="Weather Icon" class="weather-icon">
+                        <div class="temp-container">
+                            <h2 id="temperature">--</h2>
+                            <span class="unit display-unit">°C</span>
+                        </div>
+                        <p id="weather-condition" class="weather-condition">--</p>
+                    </div>
+
+                    <div class="weather-details">
+                        <div class="detail-box">
+                            <i class="fa-solid fa-droplet"></i>
+                            <div>
+                                <p class="detail-title">Humidity</p>
+                                <p id="humidity" class="detail-value">--%</p>
+                            </div>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="detail-box">
+                            <i class="fa-solid fa-wind"></i>
+                            <div>
+                                <p class="detail-title">Wind Speed</p>
+                                <p id="wind-speed" class="detail-value">-- m/s</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="btn-add-compare" class="btn-secondary mt-15 w-full">
+                        <i class="fa-solid fa-plus"></i> Add to Comparison
+                    </button>
+                </section>
+
+                <!-- Hourly Forecast -->
+                <section class="hourly-forecast panel">
+                    <h3 class="panel-title"><i class="fa-regular fa-clock"></i> 24-Hour Forecast</h3>
+                    <div class="hourly-container" id="hourly-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Column: 5-Day & Charts -->
+            <div class="dashboard-right">
+                <!-- 5-Day Forecast -->
+                <section class="daily-forecast panel">
+                    <h3 class="panel-title"><i class="fa-regular fa-calendar-days"></i> 5-Day Forecast</h3>
+                    <div class="daily-container" id="daily-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </section>
+
+                <!-- Weather Trend Charts -->
+                <section class="charts-section panel">
+                    <div class="charts-header">
+                        <h3 class="panel-title"><i class="fa-solid fa-chart-line"></i> Forecast Trends</h3>
+                        <div class="chart-tabs">
+                            <button class="chart-tab active" data-chart="temp">Temp</button>
+                            <button class="chart-tab" data-chart="humid">Humidity</button>
+                            <button class="chart-tab" data-chart="wind">Wind</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Bottom Row: Analytics & Comparison -->
+            <div class="dashboard-bottom">
+                <!-- Monthly Analytics -->
+                <section class="analytics-section panel">
+                    <h3 class="panel-title"><i class="fa-solid fa-chart-pie"></i> Local History (Last 7 Days)</h3>
+                    <div class="analytics-grid">
+                        <div class="analytics-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Avg Temp</span>
+                                <span class="stat-value" id="stat-avg-temp">--</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Hottest Day</span>
+                                <span class="stat-value" id="stat-hottest">--</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Rainy Days</span>
+                                <span class="stat-value" id="stat-rainy">--</span>
+                            </div>
+                        </div>
+                        <div class="history-chart-container">
+                            <canvas id="historyChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- City Comparison -->
+                <section class="comparison-section panel">
+                    <h3 class="panel-title"><i class="fa-solid fa-map-location-dot"></i> City Comparison</h3>
+                    <div class="comparison-container" id="comparison-container">
+                        <p class="empty-msg">No cities added to comparison yet.</p>
+                        <!-- Populated by JS -->
+                    </div>
+                </section>
+            </div>
+
+        </div> <!-- End Dashboard Grid -->
+    </main>
+
+    <!-- App Logic -->
+    <script src="script.js"></script>
+</body>
+
+</html>

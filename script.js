@@ -1,4 +1,4 @@
-const API_KEY = 'b0fa05f9965a314fddc79ade01196fff';
+const API_KEY = 'YOUR_API_KEY_HERE'; // DO NOT commit real API keys to GitHub!
 const BASE_URL = 'https://api.openweathermap.org/data/2.5';
 
 // State Management

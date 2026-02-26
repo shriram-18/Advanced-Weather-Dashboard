@@ -2,8 +2,6 @@
 
 A beautiful, modern, and highly interactive Weather Dashboard built with vanilla HTML, CSS, and JavaScript. It utilizes the free tier of the **OpenWeather API** to fetch comprehensive realtime weather data and multi-day forecasts.
 
-![Open website ](https://winter-sepia.vercel.app/)
-
 ---
 
 ## ✨ Key Features
